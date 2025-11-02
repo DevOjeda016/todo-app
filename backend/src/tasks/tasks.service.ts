@@ -40,7 +40,7 @@ export class TasksService {
 
   async remove(id: string): Promise<void> {
     const task = await this.findOne(id);
-    await this.taskRepository.softRemove(task);
+    await this.taskRepository.softDelete(task.id);
   }
 
   async archive(id: string): Promise<Task> {
