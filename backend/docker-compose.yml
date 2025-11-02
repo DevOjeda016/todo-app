@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: todo-db
+    restart: always
+    env_file:
+      - .env.development
+    ports:
+      - '5432:5432' # Mapea puerto local al contenedor
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
