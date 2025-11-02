@@ -1,0 +1,28 @@
+@baseUrl = http://localhost:3000/api/tasks
+
+### Create a new task
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "title": "Learn NestJS",
+  "description": "Complete NestJS fundamentals course"
+}
+
+### Get all tasks
+GET {{baseUrl}}
+
+### Get task by ID
+GET {{baseUrl}}/efa02c2c-4d50-4aa4-8ff5-6a480c0cc244
+
+### Update task
+PATCH {{baseUrl}}/efa02c2c-4d50-4aa4-8ff5-6a480c0cc244
+Content-Type: application/json
+
+{
+  "title": "Learn NestJS Advanced",
+  "description": "Complete NestJS advanced course"
+}
+
+### Delete task
+DELETE {{baseUrl}}/efa02c2c-4d50-4aa4-8ff5-6a480c0cc244
