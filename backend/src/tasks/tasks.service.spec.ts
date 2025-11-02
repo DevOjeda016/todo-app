@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -66,9 +67,7 @@ describe('TasksService', () => {
       expect(mockTaskRepository.find).toHaveBeenCalled();
       expect(result).toEqual(tasks);
     });
-  });
 
-  describe('findOne', () => {
     it('should return a single task', async () => {
       const task = new Task();
       const id = 'some-id';
@@ -80,6 +79,19 @@ describe('TasksService', () => {
         where: { id },
       });
       expect(result).toEqual(task);
+    });
+  });
+
+  describe('findOne', () => {
+    it('should throw NotFoundException if task not found', async () => {
+      const id = 'some-non-exists-id';
+
+      mockTaskRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.findOne(id)).rejects.toThrow(NotFoundException);
+      expect(mockTaskRepository.findOne).toHaveBeenCalledWith({
+        where: { id },
+      });
     });
   });
 
@@ -123,6 +135,26 @@ describe('TasksService', () => {
         where: { id },
       });
       expect(mockTaskRepository.softDelete).toHaveBeenCalledWith(id);
+    });
+  });
+
+  describe('archive', () => {
+    it('should archive a task', async () => {
+      const id = 'some-id';
+      const task = new Task();
+      task.id = id;
+      mockTaskRepository.findOne.mockResolvedValue(task);
+      mockTaskRepository.update.mockResolvedValue({ affected: 1 });
+
+      await service.archive(id);
+
+      expect(mockTaskRepository.findOne).toHaveBeenCalledWith({
+        where: { id },
+      });
+      expect(mockTaskRepository.save).toHaveBeenCalledWith({
+        ...task,
+        archived: true,
+      });
     });
   });
 });
