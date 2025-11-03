@@ -2,7 +2,19 @@
   <h2 class="text-lg text-center font-semibold mb-4 text-sky-900 dark:text-slate-100">Confirmación</h2>
   <p class="text-center text-sky-900 dark:text-slate-200 mb-6">{{ message }}</p>
   <div class="flex justify-center gap-2">
-    <button type="button" (click)="onCancel()" class="px-3 py-2 w-full rounded-2xl bg-gray-500 text-white hover:bg-gray-600">Cancelar</button>
-    <button type="button" (click)="onConfirm()" class="px-3 py-2 w-full rounded-2xl bg-red-600 text-white hover:bg-red-700">Confirmar</button>
+    <button type="button" (click)="onCancel()" class="px-3 py-2 w-full rounded-2xl bg-gray-500 text-white hover:bg-gray-600">{{ cancelText }}</button>
+    <button
+      type="button"
+      (click)="onConfirm()"
+      class="px-3 py-2 w-full rounded-2xl text-white"
+      [class.bg-sky-600]="variant === 'primary'"
+      [class.hover\:bg-sky-700]="variant === 'primary'"
+      [class.bg-amber-600]="variant === 'warning'"
+      [class.hover\:bg-amber-700]="variant === 'warning'"
+      [class.bg-red-600]="variant === 'danger'"
+      [class.hover\:bg-red-700]="variant === 'danger'"
+    >
+      {{ confirmText }}
+    </button>
   </div>
 </dialog>

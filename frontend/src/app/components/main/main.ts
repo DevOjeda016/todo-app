@@ -122,9 +122,27 @@ export class Main {
     }
   }
 
-  async onDelete(id: string, confirmRef?: { open: (message: string) => Promise<boolean> }) {
+  async onDelete(
+    id: string,
+    confirmRef?: {
+      open: (
+        message: string,
+        options?: {
+          confirmText?: string;
+          cancelText?: string;
+          variant?: 'primary' | 'warning' | 'danger';
+        },
+      ) => Promise<boolean>;
+    },
+  ) {
     try {
-      const ok = confirmRef ? await confirmRef.open('¿Eliminar esta tarea?') : true;
+      const ok = confirmRef
+        ? await confirmRef.open('¿Eliminar esta tarea?', {
+            confirmText: 'Eliminar',
+            cancelText: 'Cancelar',
+            variant: 'danger',
+          })
+        : true;
       if (!ok) return;
       await this.taskService.deleteTask(id);
       this.tasks.update((prev) => prev.filter((t) => t.id !== id));
