@@ -1,17 +1,19 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter, HostListener, ElementRef } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faArchive,
-  faClock,
-  faTags,
   faCalendarDays,
-  faTrash,
-  faPen,
+  faClock,
   faEllipsisVertical,
+  faPen,
+  faTags,
+  faTrash,
 } from '@fortawesome/free-solid-svg-icons';
+import { Importance, Status } from '../../../core/enums';
 import { Task } from '../../../core/models';
-import { Status } from '../../../core/enums';
 
 @Component({
   selector: 'app-task-card',
@@ -67,8 +69,43 @@ export class TaskCardComponent {
 
   get dueDateFormatted() {
     if (!this.task.dueDate) return null;
-    const d = new Date(this.task.dueDate);
+    const str = this.task.dueDate;
+    let d: Date;
+    if (str.includes('T')) d = new Date(str);
+    else {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const [y, m, day] = str.split('-').map((n) => Number(n));
+      d = new Date(y, (m || 1) - 1, day || 1);
+    }
     return d.toLocaleDateString();
+  }
+
+  statusSelectClass() {
+    switch (this.task.status) {
+      case Status.TODO:
+        return 'bg-sky-100 text-sky-700 dark:bg-sky-800 dark:text-sky-100';
+      case Status.IN_PROGRESS:
+        return 'bg-amber-100 text-amber-700 dark:bg-amber-800 dark:text-amber-100';
+      case Status.COMPLETED:
+        return 'bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-100';
+      default:
+        return '';
+    }
+  }
+
+  importanceClass() {
+    switch (this.task.importance) {
+      case Importance.NOTHING:
+        return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-100';
+      case Importance.LOW:
+        return 'bg-sky-100 text-sky-700 dark:bg-sky-800 dark:text-sky-100';
+      case Importance.MEDIUM:
+        return 'bg-amber-100 text-amber-700 dark:bg-amber-800 dark:text-amber-100';
+      case Importance.HIGH:
+        return 'bg-rose-100 text-rose-700 dark:bg-rose-800 dark:text-rose-100';
+      default:
+        return '';
+    }
   }
 
   onArchive() {

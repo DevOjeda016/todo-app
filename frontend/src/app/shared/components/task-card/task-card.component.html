@@ -57,17 +57,13 @@
     <!-- Always visible on all screens: status + importance -->
     <div class="flex items-center gap-2 w-full sm:w-auto justify-start sm:justify-end flex-wrap">
       <select
-        class="text-xs px-2 py-1 rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-800 dark:text-sky-100 max-w-[12rem]"
+        class="text-xs px-2 py-1 rounded-lg max-w-[12rem]"
+        [ngClass]="statusSelectClass()"
         (change)="onStatusChange($any($event.target).value)"
       >
-        <option *ngFor="let s of statusValues" [value]="s" [selected]="task.status === s">
-          {{ s }}
-        </option>
+        <option *ngFor="let s of statusValues" [value]="s" [selected]="task.status === s">{{ s }}</option>
       </select>
-      <span
-        class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-800 dark:text-amber-100"
-        >{{ task.importance }}</span
-      >
+      <span class="text-xs px-2 py-1 rounded-full" [ngClass]="importanceClass()">{{ task.importance }}</span>
       <!-- Action icons only on sm+ -->
       <div class="hidden sm:flex items-center gap-2">
         <button
