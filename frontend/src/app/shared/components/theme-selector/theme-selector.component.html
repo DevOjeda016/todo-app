@@ -1,0 +1,45 @@
+<div class="relative">
+  <button
+    (click)="openThemeMenu = !openThemeMenu"
+    class="flex items-center justify-center w-10 h-10 rounded-full transition-all bg-sky-600 dark:bg-sky-800 hover:bg-sky-700 dark:hover:bg-sky-900"
+  >
+    @switch (currentTheme()) {
+      @case ('light') {
+        <fa-icon [icon]="faSun" class="text-sky-50"></fa-icon>
+      }
+      @case ('dark') {
+        <fa-icon [icon]="faMoon" class="text-sky-50"></fa-icon>
+      }
+      @default {
+        <fa-icon [icon]="faDesktop" class="text-sky-50"></fa-icon>
+      }
+    }
+  </button>
+
+  @if (openThemeMenu) {
+    <div
+      class="text-sky-900 dark:text-sky-50 absolute right-0 mt-2 w-32 bg-white dark:bg-sky-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-2 space-y-1"
+    >
+      <button
+        class="flex items-center gap-2 w-full text-left px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-sky-800"
+        (click)="selectTheme('light')"
+      >
+        <span>Claro</span>
+      </button>
+
+      <button
+        class="flex items-center gap-2 w-full text-left px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-sky-800"
+        (click)="selectTheme('dark')"
+      >
+        <span>Oscuro</span>
+      </button>
+
+      <button
+        class="flex items-center gap-2 w-full text-left px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-sky-800"
+        (click)="selectTheme('auto')"
+      >
+        <span>Sistema</span>
+      </button>
+    </div>
+  }
+</div>

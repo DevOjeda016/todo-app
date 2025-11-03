@@ -9,163 +9,49 @@
       type="text"
       class="w-full bg-transparent placeholder:text-gray-500 border-sky-600 hover:border-sky-700 focus:border-sky-900 text-sky-900 dark:text-sky-50 text-sm dark:border-gray-100 rounded-full px-10 py-2 transition duration-300 ease focus:outline-none dark:focus:border-sky-800 focus:border-2 border-2 dark:hover:border-gray-400 shadow-sm focus:shadow"
       placeholder="Buscar tarea..."
+      (input)="searchTerm.set($any($event.target).value)"
     />
   </div>
   <div class="flex flex-row gap-2">
     <select
-      name=""
-      id=""
-      class="dark:bg-sky-800 dark:hover:bg-sky-900 bg-sky-600 hover:bg-sky-700 hover:bg-sky-70 font-bold rounded-xl transition-colors text-sky-50 text-center px-2 h-10"
+      class="dark:bg-sky-800 dark:hover:bg-sky-900 bg-sky-600 hover:bg-sky-700 font-bold rounded-xl transition-colors text-sky-50 text-center px-2 h-10"
+      (change)="onStatusFilterChange($any($event.target).value)"
     >
       <option value="all">Todas</option>
-      <option value="in-progress">En progreso</option>
-      <option value="completed">Completadas</option>
+      @for (s of statusOptions; track $index) {
+        @if (s !== 'all') {
+          <option [value]="s">{{ s }}</option>
+        }
+      }
     </select>
     <button
       type="button"
-      class="bottom-4 right-4 dark:bg-sky-800 dark:hover:bg-sky-900 bg-sky-600 hover:bg-sky-700 hover:bg-sky-70 font-bold rounded-full w-10 h-10 transition-colors"
+      (click)="toggleShowArchived()"
+      class="bottom-4 right-4 dark:bg-sky-800 dark:hover:bg-sky-900 bg-sky-600 hover:bg-sky-700 font-bold rounded-full w-10 h-10 transition-colors"
+      [class.opacity-50]="!showArchived()"
+      [title]="showArchived() ? 'Ocultar archivadas' : 'Mostrar archivadas'"
     >
       <fa-icon [icon]="faArchive" class="text-sky-50"></fa-icon>
     </button>
-    <div class="relative">
-      <button
-        (click)="openThemeMenu = !openThemeMenu"
-        class="flex items-center justify-center w-10 h-10 rounded-full transition-all bg-sky-600 dark:bg-sky-800 hover:bg-sky-700 dark:hover:bg-sky-900"
-      >
-        @switch (currentTheme()) {
-          @case ('light') {
-            <fa-icon [icon]="faSun" class="text-sky-50"></fa-icon>
-          }
-          @case ('dark') {
-            <fa-icon [icon]="faMoon" class="text-sky-50"></fa-icon>
-          }
-          @default {
-            <fa-icon [icon]="faDesktop" class="text-sky-50"></fa-icon>
-          }
-        }
-      </button>
-
-      @if (openThemeMenu) {
-        <div
-          class="text-sky-900 dark:text-sky-50 absolute right-0 mt-2 w-32 bg-white dark:bg-sky-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-2 space-y-1"
-        >
-          <button
-            class="flex items-center gap-2 w-full text-left px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-sky-800"
-            (click)="selectTheme('light')"
-          >
-            <span>Claro</span>
-          </button>
-
-          <button
-            class="flex items-center gap-2 w-full text-left px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-sky-800"
-            (click)="selectTheme('dark')"
-          >
-            <span>Oscuro</span>
-          </button>
-
-          <button
-            class="flex items-center gap-2 w-full text-left px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-sky-800"
-            (click)="selectTheme('auto')"
-          >
-            <span>Sistema</span>
-          </button>
-        </div>
-      }
-    </div>
+    <app-theme-selector />
   </div>
 </div>
 
-<dialog
-  #taskModal
-  class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-xl p-6 w-96 bg-white dark:bg-slate-900 shadow-lg"
->
-  <h2 class="text-lg text-center font-semibold mb-4 text-sky-900 dark:text-slate-100">
-    Crear Tarea
-  </h2>
+<!-- Tasks grid -->
+<section class="mt-4 grid grid-cols-1 gap-3">
+  @if (filteredTasks().length === 0) {
+    <p class="text-center text-sm text-gray-500 dark:text-gray-400 py-6">No hay tareas para mostrar.</p>
+  } @else {
+    @for (task of filteredTasks(); track task.id) {
+      <app-task-card [task]="task" (archive)="onArchive($event)" (changeStatus)="onChangeStatus($event)" />
+    }
+  }
+</section>
 
-  <form [formGroup]="taskForm" (ngSubmit)="submitTask(taskModal)" class="flex flex-col gap-3">
-    <label class="text-sm font-medium text-sky-900 dark:text-sky-100">Título</label>
-    <input
-      type="text"
-      formControlName="title"
-      placeholder="Título"
-      class="w-full bg-transparent placeholder:text-gray-500 border-gray-600 hover:border-sky-600 focus:border-sky-700 text-sky-900 dark:text-sky-50 text-sm dark:border-gray-100 rounded-2xl px-2 py-2 transition duration-300 ease focus:outline-none dark:focus:border-sky-800 focus:border border dark:hover:border-gray-400 shadow-sm focus:shadow"
-    />
-
-    <label class="text-sm font-medium text-sky-900 dark:text-sky-100">Descripción</label>
-    <textarea
-      formControlName="description"
-      placeholder="Descripción"
-      class="w-full bg-transparent placeholder:text-gray-500 border-gray-600 hover:border-sky-600 focus:border-sky-700 text-sky-900 dark:text-sky-50 text-sm dark:border-gray-100 rounded-2xl px-2 py-2 transition duration-300 ease focus:outline-none dark:focus:border-sky-800 focus:border border dark:hover:border-gray-400 shadow-sm focus:shadow"
-    ></textarea>
-
-    <label class="text-sm font-medium text-sky-900 dark:text-sky-100">Fecha límite</label>
-    <input
-      type="date"
-      formControlName="dueDate"
-      class="w-full bg-transparent placeholder:text-gray-500 border-gray-600 hover:border-sky-600 focus:border-sky-700 text-sky-900 dark:text-sky-50 text-sm dark:border-gray-100 rounded-2xl px-2 py-2 transition duration-300 ease focus:outline-none dark:focus:border-sky-800 focus:border border dark:hover:border-gray-400 shadow-sm focus:shadow"
-    />
-
-    <label class="text-sm font-medium text-sky-900 dark:text-sky-100">Minutos estimados</label>
-    <input
-      type="number"
-      formControlName="estimatedMinutes"
-      placeholder="Minutos estimados"
-      class="w-full bg-transparent placeholder:text-gray-500 border-gray-600 hover:border-sky-600 focus:border-sky-700 text-sky-900 dark:text-sky-50 text-sm dark:border-gray-100 rounded-2xl px-2 py-2 transition duration-300 ease focus:outline-none dark:focus:border-sky-800 focus:border border dark:hover:border-gray-400 shadow-sm focus:shadow"
-    />
-
-    <label class="text-sm font-medium text-sky-900 dark:text-sky-100">Tags</label>
-    <input
-      type="text"
-      formControlName="tags"
-      placeholder="Tags separadas por coma"
-      class="w-full bg-transparent placeholder:text-gray-500 border-gray-600 hover:border-sky-600 focus:border-sky-700 text-sky-900 dark:text-sky-50 text-sm dark:border-gray-100 rounded-2xl px-2 py-2 transition duration-300 ease focus:outline-none dark:focus:border-sky-800 focus:border border dark:hover:border-gray-400 shadow-sm focus:shadow"
-    />
-
-    <label class="text-sm font-medium text-sky-900 dark:text-sky-100">Importancia</label>
-    <select
-      formControlName="importance"
-      class="w-full bg-transparent placeholder:text-gray-500 border-gray-600 hover:border-sky-600 focus:border-sky-700 text-sky-900 dark:text-sky-50 text-sm dark:border-gray-100 rounded-2xl px-2 py-2 transition duration-300 ease focus:outline-none dark:focus:border-sky-800 focus:border border dark:hover:border-gray-400 shadow-sm focus:shadow"
-    >
-      <option [value]="null" selected>Selecciona una importancia</option>
-      @for (importance of importanceValues; track $index) {
-        <option [value]="importance">{{ importance }}</option>
-      }
-    </select>
-
-    <label class="text-sm font-medium text-sky-900 dark:text-sky-100">Estado</label>
-    <select
-      id="status"
-      formControlName="status"
-      class="w-full bg-transparent placeholder:text-gray-500 border-gray-600 hover:border-sky-600 focus:border-sky-700 text-sky-900 dark:text-sky-50 text-sm dark:border-gray-100 rounded-2xl px-2 py-2 transition duration-300 ease focus:outline-none dark:focus:border-sky-800 focus:border border dark:hover:border-gray-400 shadow-sm focus:shadow"
-    >
-      <option [value]="null" selected>Selecciona un estado</option>
-      @for (status of statusValues; track $index) {
-        <option [value]="status">{{ status }}</option>
-      }
-    </select>
-
-    <div class="flex justify-center gap-2 mt-2">
-      <button
-        type="button"
-        (click)="taskModal.close()"
-        class="px-3 py-2 w-full rounded-2xl bg-gray-500 text-white hover:bg-gray-600"
-      >
-        Cancelar
-      </button>
-      <button
-        type="submit"
-        [disabled]="taskForm.invalid"
-        class="px-3 py-2 w-full rounded-2xl bg-sky-600 text-white hover:bg-sky-700 disabled:opacity-50"
-      >
-        Guardar
-      </button>
-    </div>
-  </form>
-</dialog>
+<app-create-task-dialog #taskDialog (created)="onTaskCreated($event)" />
 
 <button
-  (click)="taskModal.showModal()"
+  (click)="taskDialog.open()"
   class="absolute bottom-4 right-4 dark:bg-sky-800 dark:hover:bg-sky-900 bg-sky-600 hover:bg-sky-700 font-bold rounded-full w-10 h-10 transition-colors flex items-center justify-center"
 >
   <fa-icon [icon]="faPlus" class="text-sky-50"></fa-icon>

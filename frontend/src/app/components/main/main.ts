@@ -1,112 +1,95 @@
-/* eslint-disable @typescript-eslint/unbound-method */
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, computed, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import {
-  faArchive,
-  faDesktop,
-  faMoon,
-  faPlus,
-  faSearch,
-  faSun,
-} from '@fortawesome/free-solid-svg-icons';
-import { Importance } from '../../../enums/importance.enums';
-import { Status } from '../../../enums/status.enums';
-import { CreateTask } from '../../interfaces/create-task';
-import { Task } from '../../interfaces/task';
-import { ThemeService } from '../../services/theme.service';
+import { faArchive, faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { ThemeSelectorComponent } from '../../shared/components/theme-selector/theme-selector.component';
+import { CreateTaskDialogComponent } from '../../shared/components/create-task-dialog/create-task-dialog.component';
+import { TaskCardComponent } from '../../shared/components/task-card/task-card.component';
+import { Task } from '../../core/models';
+import { TaskService } from '../../core/services';
+import { Status } from '../../core/enums';
 
 @Component({
   selector: 'app-main',
   standalone: true,
-  imports: [FontAwesomeModule, ReactiveFormsModule, CommonModule],
+  imports: [
+    FontAwesomeModule,
+    CommonModule,
+    ThemeSelectorComponent,
+    CreateTaskDialogComponent,
+    TaskCardComponent,
+  ],
   templateUrl: './main.html',
 })
 export class Main {
-  private themeService = inject(ThemeService);
-  private fb = inject(FormBuilder);
+  constructor(private readonly taskService: TaskService) {
+    void this.loadTasks();
+  }
 
-  currentTheme = this.themeService.currentTheme;
-  openThemeMenu = false;
+  // State as signals (zoneless change detection)
+  tasks = signal<Task[]>([]);
+
+  // Filters
+  searchTerm = signal('');
+  showArchived = signal(true);
+  statusFilter = signal<'all' | Status>('all');
+  statusOptions: Array<'all' | Status> = ['all', ...Object.values(Status)];
 
   // Íconos
   faPlus = faPlus;
   faSearch = faSearch;
   faArchive = faArchive;
-  faMoon = faMoon;
-  faSun = faSun;
-  faDesktop = faDesktop;
 
-  taskForm = this.fb.group({
-    title: ['', [Validators.maxLength(200), Validators.required]],
-    description: [''],
-    dueDate: [null as string | null],
-    estimatedMinutes: [null as number | null, [Validators.min(1)]],
-    tags: [''],
-    importance: [null as Importance | null],
-    status: [null as Status | null],
-  });
-
-  // Para usar en el template
-  Status = Status;
-  Importance = Importance;
-  statusValues = Object.values(Status);
-  importanceValues = Object.values(Importance);
-
-  selectTheme(mode: 'light' | 'dark' | 'auto') {
-    this.themeService.setTheme(mode);
-    this.openThemeMenu = false;
+  async loadTasks() {
+    try {
+      const list = await this.taskService.getTasks();
+      this.tasks.set(list);
+    } catch (err) {
+      console.error('Error cargando tareas:', err);
+      this.tasks.set([]);
+    }
   }
 
-  async submitTask(dialog: HTMLDialogElement) {
-    if (this.taskForm.invalid) {
-      console.error('Form is invalid');
-      return;
+  onTaskCreated(task: Task) {
+    this.tasks.update((prev) => [task, ...prev]);
+  }
+
+  filteredTasks = computed((): Task[] => {
+    const tasks = this.tasks();
+    const term = this.searchTerm().toLowerCase();
+    const status = this.statusFilter();
+    const showArchived = this.showArchived();
+
+    return tasks.filter((t) => {
+      const matchesSearch = term
+        ? (t.title + ' ' + (t.description || '') + ' ' + (t.tags?.join(' ') || ''))
+            .toLowerCase()
+            .includes(term)
+        : true;
+
+      const matchesStatus = status === 'all' ? true : t.status === status;
+      const matchesArchived = showArchived ? true : !t.archived;
+      return matchesSearch && matchesStatus && matchesArchived;
+    });
+  });
+
+  toggleShowArchived() {
+    this.showArchived.update((v) => !v);
+  }
+
+  onStatusFilterChange(val: string) {
+    if (val === 'all' || (Object.values(Status) as string[]).includes(val)) {
+      this.statusFilter.set(val as 'all' | Status);
     }
+  }
 
-    const raw = this.taskForm.value;
+  async onArchive(id: string) {
+    const updated = await this.taskService.archiveTask(id);
+    this.tasks.update((prev) => prev.map((t) => (t.id === id ? updated : t)));
+  }
 
-    // Convertir tags a array
-    const tagsArray = raw.tags
-      ? raw.tags
-          .split(',')
-          .map((t) => t.trim())
-          .filter((t) => t.length > 0)
-      : [];
-
-    // Construir payload limpio
-    const payload: Partial<CreateTask> = {
-      title: raw.title!,
-    };
-
-    if (raw.description) payload.description = raw.description;
-    if (raw.dueDate) payload.dueDate = raw.dueDate;
-    if (raw.estimatedMinutes) payload.estimatedMinutes = raw.estimatedMinutes;
-    if (tagsArray.length > 0) payload.tags = tagsArray;
-    if (raw.importance) payload.importance = raw.importance;
-    if (raw.status) payload.status = raw.status;
-
-    try {
-      const response = await fetch('http://localhost:3000/api/tasks', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = (await response.json()) as Task;
-      console.log('Task created:', data);
-
-      dialog.close();
-      this.taskForm.reset();
-    } catch (error) {
-      console.error('Error creating task:', error);
-    }
+  async onChangeStatus(evt: { id: string; status: Status }) {
+    const updated = await this.taskService.updateTask(evt.id, { status: evt.status });
+    this.tasks.update((prev) => prev.map((t) => (t.id === evt.id ? updated : t)));
   }
 }

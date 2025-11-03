@@ -1,0 +1,42 @@
+<article class="rounded-2xl border border-sky-200 dark:border-sky-800 bg-white dark:bg-slate-900 p-4 shadow-sm hover:shadow transition">
+  <header class="flex items-start justify-between gap-4">
+    <div class="space-y-1">
+      <h3 class="text-sky-900 dark:text-sky-100 font-semibold text-lg">{{ task.title }}</h3>
+      <p class="text-sm text-gray-600 dark:text-gray-300" *ngIf="task.description">{{ task.description }}</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <select
+        class="text-xs px-2 py-1 rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-800 dark:text-sky-100"
+        [value]="task.status"
+(change)="onStatusChange($any($event.target).value)"
+      >
+        <option *ngFor="let s of statusValues" [value]="s">{{ s }}</option>
+      </select>
+      <span class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-800 dark:text-amber-100">{{ task.importance }}</span>
+      <button type="button" class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center" (click)="onArchive()" [title]="task.archived ? 'Desarchivar' : 'Archivar'">
+        <fa-icon [icon]="faArchive"></fa-icon>
+      </button>
+    </div>
+  </header>
+
+  <div class="mt-3 flex flex-wrap items-center gap-3 text-sm text-gray-700 dark:text-gray-200">
+    <div class="flex items-center gap-2" *ngIf="dueDateFormatted">
+      <fa-icon [icon]="faCalendarDays"></fa-icon>
+      <span>{{ dueDateFormatted }}</span>
+    </div>
+    <div class="flex items-center gap-2" *ngIf="task.estimatedMinutes">
+      <fa-icon [icon]="faClock"></fa-icon>
+      <span>{{ task.estimatedMinutes }} min</span>
+    </div>
+    <div class="flex items-center gap-2" *ngIf="task.tags?.length">
+      <fa-icon [icon]="faTags"></fa-icon>
+      <div class="flex flex-wrap gap-1">
+        <span class="text-xs px-2 py-0.5 rounded-full border border-gray-300 dark:border-gray-700" *ngFor="let tag of task.tags">{{ tag }}</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 ml-auto" *ngIf="task.archived">
+      <fa-icon [icon]="faArchive"></fa-icon>
+      <span>Archivada</span>
+    </div>
+  </div>
+</article>

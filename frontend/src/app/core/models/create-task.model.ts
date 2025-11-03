@@ -1,5 +1,4 @@
-import { Importance } from '../../enums/importance.enums';
-import { Status } from '../../enums/status.enums';
+import { Importance, Status } from '../enums';
 
 export interface CreateTask {
   title: string;
