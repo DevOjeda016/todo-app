@@ -37,6 +37,7 @@ docker compose up -d
 ```
 
 - API: `http://localhost:3000/api`
+- Swagger UI: `http://localhost:3000/api/docs`
 - El servicio `backend` sobreescribe `DB_HOST=db` para conectarse al contenedor `db`.
 
 ## Solo base de datos (opcional, desarrollo)

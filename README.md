@@ -30,6 +30,7 @@ xdg-open http://localhost:4200 || open http://localhost:4200 || true
 
 - Frontend: http://localhost:4200
 - API: http://localhost:3000/api
+- Swagger UI: http://localhost:3000/api/docs
 
 ### Verificar estado de servicios
 
