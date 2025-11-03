@@ -26,7 +26,7 @@ export class Task {
   @Column({
     type: 'enum',
     enum: Importance,
-    default: Importance.NINGUNA,
+    default: Importance.NOTHING,
   })
   importance: Importance; // Task importance level (enum)
 

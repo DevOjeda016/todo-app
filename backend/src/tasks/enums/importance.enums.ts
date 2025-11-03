@@ -1,6 +1,6 @@
 export enum Importance {
-  NINGUNA = 'ninguna',
-  BAJA = 'baja',
-  MEDIA = 'media',
-  ALTA = 'alta',
+  NOTHING = 'ninguna',
+  LOW = 'baja',
+  MEDIUM = 'media',
+  HIGH = 'alta',
 }
