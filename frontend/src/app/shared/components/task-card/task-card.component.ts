@@ -8,6 +8,7 @@ import {
   faCalendarDays,
   faTrash,
   faPen,
+  faEllipsisVertical,
 } from '@fortawesome/free-solid-svg-icons';
 import { Task } from '../../../core/models';
 import { Status } from '../../../core/enums';
@@ -36,6 +37,17 @@ export class TaskCardComponent {
   faTags = faTags;
   faCalendarDays = faCalendarDays;
   faPen = faPen;
+  faEllipsisVertical = faEllipsisVertical;
+
+  openMenu = false;
+
+  toggleMenu() {
+    this.openMenu = !this.openMenu;
+  }
+
+  closeMenu() {
+    this.openMenu = false;
+  }
 
   get dueDateFormatted() {
     if (!this.task.dueDate) return null;
