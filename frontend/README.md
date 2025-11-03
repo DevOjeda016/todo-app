@@ -9,6 +9,14 @@ SPA en Angular 20 + Tailwind que consume la API del backend.
 
 ## Instalación y ejecución
 
+Opción A) Docker Compose (desde la raíz del repo)
+
+```bash
+docker compose up -d
+```
+
+Opción B) Local
+
 ```bash
 pnpm install
 pnpm start

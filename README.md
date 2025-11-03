@@ -15,9 +15,46 @@ Monorepo con un backend en NestJS + PostgreSQL y un frontend en Angular.
 
 ## Puesta en marcha rápida
 
+Opción A) Todo con Docker Compose (recomendada)
+
+```bash
+# 1) Variables de entorno
+test -f backend/.env.development || cp backend/.env.development.example backend/.env.development
+
+# 2) Levantar todo (db + backend + frontend)
+docker compose up -d
+
+# 3) Abrir la app
+xdg-open http://localhost:4200 || open http://localhost:4200 || true
+```
+
+- Frontend: http://localhost:4200
+- API: http://localhost:3000/api
+
+### Verificar estado de servicios
+
+```bash
+# Ver servicios corriendo
+docker compose ps
+
+# Ver logs de todos los servicios
+docker compose logs
+
+# Ver logs de un servicio específico
+docker compose logs backend
+docker compose logs frontend
+
+# Si algún servicio no está corriendo, levantarlo:
+docker compose up -d backend frontend
+
+# Reiniciar todo
+docker compose restart
+```
+
+Opción B) Manual (sin contenedores)
+
 1) Backend
 - Copia variables: `cp backend/.env.development.example backend/.env.development`
-- (Opcional e2e) `cp backend/.env.testing.example backend/.env.test`
 - Levanta PostgreSQL: `cd backend && docker compose -f docker-compose.dev.yml up -d`
 - Instala y corre: `pnpm -C backend install` y `pnpm -C backend start:dev`
 
@@ -34,4 +71,5 @@ Monorepo con un backend en NestJS + PostgreSQL y un frontend en Angular.
 ## Notas
 
 - CORS en backend permite `http://localhost:4200` por defecto.
+- En Docker Compose, el backend usa `DB_HOST=db` (override) y carga variables desde `backend/.env.development`.
 - Endpoints principales: `GET/POST /api/tasks`, `GET/PATCH/DELETE /api/tasks/:id`, `PATCH /api/tasks/:id/archive`.

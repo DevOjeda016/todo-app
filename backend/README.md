@@ -26,10 +26,24 @@ Campos clave en `.env.development`:
 - `POSTGRES_PASSWORD` (para el contenedor de PostgreSQL)
 - `TYPEORM_SYNCHRONIZE` (en dev `true`)
 
-## Levantar base de datos (desarrollo)
+## Levantar con Docker Compose (monorepo)
+
+Desde la raíz del proyecto puedes levantar DB+API+Frontend:
 
 ```bash
-# Desde este directorio
+# En la raíz del repo
+cp -n backend/.env.development.example backend/.env.development || true
+docker compose up -d
+```
+
+- API: `http://localhost:3000/api`
+- El servicio `backend` sobreescribe `DB_HOST=db` para conectarse al contenedor `db`.
+
+## Solo base de datos (opcional, desarrollo)
+
+Si prefieres correr solo la DB desde este directorio:
+
+```bash
 docker compose -f docker-compose.dev.yml up -d
 ```
 

@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:17
+    container_name: todo-db
+    restart: unless-stopped
+    env_file:
+      - backend/.env.development
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    image: node:20-alpine
+    container_name: todo-backend
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    env_file:
+      - backend/.env.development
+    environment:
+      - DB_HOST=db
+      - CI=true
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    command: >-
+      sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm start:dev"
+
+  frontend:
+    image: node:20-alpine
+    container_name: todo-frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    environment:
+      - CI=true
+    depends_on:
+      - backend
+    ports:
+      - "4200:4200"
+    command: >-
+      sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm start --host 0.0.0.0"
+
+volumes:
+  db_data:
