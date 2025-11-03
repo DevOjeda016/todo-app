@@ -76,27 +76,27 @@
       <div class="hidden sm:flex items-center gap-2">
         <button
           type="button"
-          class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center"
+          class="w-8 h-8 rounded-full hover:bg-blue-100 dark:hover:bg-blue-600 flex items-center justify-center transition-colors"
           (click)="onEdit()"
           title="Editar"
         >
-          <fa-icon [icon]="faPen"></fa-icon>
+          <fa-icon [icon]="faPen" class="text-blue-600 dark:text-blue-100"></fa-icon>
         </button>
         <button
           type="button"
-          class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center"
+          class="w-8 h-8 rounded-full hover:bg-green-100 dark:hover:bg-green-600 flex items-center justify-center transition-colors"
           (click)="onArchive()"
           [title]="task.archived ? 'Desarchivar' : 'Archivar'"
         >
-          <fa-icon [icon]="faArchive"></fa-icon>
+          <fa-icon [icon]="faArchive" class="text-green-600 dark:text-green-100"></fa-icon>
         </button>
         <button
           type="button"
-          class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center"
+          class="w-8 h-8 rounded-full hover:bg-red-100 dark:hover:bg-red-600 flex items-center justify-center transition-colors"
           (click)="onDelete()"
           title="Eliminar"
         >
-          <fa-icon [icon]="faTrash"></fa-icon>
+          <fa-icon [icon]="faTrash" class="text-red-600 dark:text-red-100"></fa-icon>
         </button>
       </div>
     </div>
