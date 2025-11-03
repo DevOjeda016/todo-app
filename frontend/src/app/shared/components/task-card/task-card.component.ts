@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -73,7 +71,6 @@ export class TaskCardComponent {
     let d: Date;
     if (str.includes('T')) d = new Date(str);
     else {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const [y, m, day] = str.split('-').map((n) => Number(n));
       d = new Date(y, (m || 1) - 1, day || 1);
     }

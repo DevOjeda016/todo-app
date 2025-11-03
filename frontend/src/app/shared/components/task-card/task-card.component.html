@@ -50,20 +50,28 @@
       <h3 class="text-sky-900 dark:text-sky-100 font-semibold text-lg truncate">
         {{ task.title }}
       </h3>
-      <p class="text-sm text-gray-600 dark:text-gray-300 break-words" *ngIf="task.description">
-        {{ task.description }}
-      </p>
+      @if (task.description) {
+        <p class="text-sm text-gray-600 dark:text-gray-300 wrap-break-word">
+          {{ task.description }}
+        </p>
+      }
     </div>
     <!-- Always visible on all screens: status + importance -->
     <div class="flex items-center gap-2 w-full sm:w-auto justify-start sm:justify-end flex-wrap">
       <select
-        class="text-xs px-2 py-1 rounded-lg max-w-[12rem]"
+        class="text-xs px-2 py-1 rounded-lg max-w-48"
         [ngClass]="statusSelectClass()"
         (change)="onStatusChange($any($event.target).value)"
       >
-        <option *ngFor="let s of statusValues" [value]="s" [selected]="task.status === s">{{ s }}</option>
+        @for (s of statusValues; track $index) {
+          <option [value]="s" [selected]="task.status === s">
+            {{ s }}
+          </option>
+        }
       </select>
-      <span class="text-xs px-2 py-1 rounded-full" [ngClass]="importanceClass()">{{ task.importance }}</span>
+      <span class="text-xs px-2 py-1 rounded-full" [ngClass]="importanceClass()">{{
+        task.importance
+      }}</span>
       <!-- Action icons only on sm+ -->
       <div class="hidden sm:flex items-center gap-2">
         <button
@@ -95,27 +103,37 @@
   </header>
 
   <div class="mt-3 flex flex-wrap items-center gap-3 text-sm text-gray-700 dark:text-gray-200">
-    <div class="flex items-center gap-2" *ngIf="dueDateFormatted">
-      <fa-icon [icon]="faCalendarDays"></fa-icon>
-      <span>{{ dueDateFormatted }}</span>
-    </div>
-    <div class="flex items-center gap-2" *ngIf="task.estimatedMinutes">
-      <fa-icon [icon]="faClock"></fa-icon>
-      <span>{{ task.estimatedMinutes }} min</span>
-    </div>
-    <div class="flex items-center gap-2" *ngIf="task.tags?.length">
-      <fa-icon [icon]="faTags"></fa-icon>
-      <div class="flex flex-wrap gap-1">
-        <span
-          class="text-xs px-2 py-0.5 rounded-full border border-gray-300 dark:border-gray-700"
-          *ngFor="let tag of task.tags"
-          >{{ tag }}</span
-        >
+    @if (dueDateFormatted) {
+      <div class="flex items-center gap-2">
+        <fa-icon [icon]="faCalendarDays"></fa-icon>
+        <span>{{ dueDateFormatted }}</span>
       </div>
-    </div>
-    <div class="flex items-center gap-2 ml-auto" *ngIf="task.archived">
-      <fa-icon [icon]="faArchive"></fa-icon>
-      <span>Archivada</span>
-    </div>
+    }
+
+    @if (task.estimatedMinutes) {
+      <div class="flex items-center gap-2">
+        <fa-icon [icon]="faClock"></fa-icon>
+        <span>{{ task.estimatedMinutes }} min</span>
+      </div>
+    }
+    @if (task.tags?.length) {
+      <div class="flex items-center gap-2">
+        <fa-icon [icon]="faTags"></fa-icon>
+        <div class="flex flex-wrap gap-1">
+          @for (tag of task.tags; track $index) {
+            <span
+              class="text-xs px-2 py-0.5 rounded-full border border-gray-300 dark:border-gray-700"
+              >{{ tag }}</span
+            >
+          }
+        </div>
+      </div>
+    }
+    @if (task.archived) {
+      <div class="flex items-center gap-2 ml-auto">
+        <fa-icon [icon]="faArchive"></fa-icon>
+        <span>Archivada</span>
+      </div>
+    }
   </div>
 </article>
