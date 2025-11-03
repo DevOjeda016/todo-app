@@ -4,6 +4,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArchive, faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { ThemeSelectorComponent } from '../../shared/components/theme-selector/theme-selector.component';
 import { CreateTaskDialogComponent } from '../../shared/components/create-task-dialog/create-task-dialog.component';
+import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 import { TaskCardComponent } from '../../shared/components/task-card/task-card.component';
 import { Task } from '../../core/models';
 import { TaskService, ToastService } from '../../core/services';
@@ -17,6 +18,7 @@ import { Status } from '../../core/enums';
     CommonModule,
     ThemeSelectorComponent,
     CreateTaskDialogComponent,
+    ConfirmDialogComponent,
     TaskCardComponent,
   ],
   templateUrl: './main.html',
@@ -99,22 +101,36 @@ export class Main {
   }
 
   async onArchive(evt: { id: string; archived: boolean }) {
-    const updated = evt.archived
-      ? await this.taskService.updateTask(evt.id, { archived: false })
-      : await this.taskService.archiveTask(evt.id);
-    this.tasks.update((prev) => prev.map((t) => (t.id === evt.id ? updated : t)));
-    this.toast.show(evt.archived ? 'Tarea desarchivada' : 'Tarea archivada', 'success');
+    try {
+      const updated = evt.archived
+        ? await this.taskService.updateTask(evt.id, { archived: false })
+        : await this.taskService.archiveTask(evt.id);
+      this.tasks.update((prev) => prev.map((t) => (t.id === evt.id ? updated : t)));
+      this.toast.show(evt.archived ? 'Tarea desarchivada' : 'Tarea archivada', 'success');
+    } catch {
+      this.toast.show('Error al actualizar archivo/estado de archivo', 'error');
+    }
   }
 
   async onChangeStatus(evt: { id: string; status: Status }) {
-    const updated = await this.taskService.updateTask(evt.id, { status: evt.status });
-    this.tasks.update((prev) => prev.map((t) => (t.id === evt.id ? updated : t)));
-    this.toast.show('Estado actualizado', 'success');
+    try {
+      const updated = await this.taskService.updateTask(evt.id, { status: evt.status });
+      this.tasks.update((prev) => prev.map((t) => (t.id === evt.id ? updated : t)));
+      this.toast.show('Estado actualizado', 'success');
+    } catch {
+      this.toast.show('Error al actualizar estado', 'error');
+    }
   }
 
-  async onDelete(id: string) {
-    await this.taskService.deleteTask(id);
-    this.tasks.update((prev) => prev.filter((t) => t.id !== id));
-    this.toast.show('Tarea eliminada', 'success');
+  async onDelete(id: string, confirmRef?: { open: (message: string) => Promise<boolean> }) {
+    try {
+      const ok = confirmRef ? await confirmRef.open('¿Eliminar esta tarea?') : true;
+      if (!ok) return;
+      await this.taskService.deleteTask(id);
+      this.tasks.update((prev) => prev.filter((t) => t.id !== id));
+      this.toast.show('Tarea eliminada', 'success');
+    } catch {
+      this.toast.show('Error al eliminar tarea', 'error');
+    }
   }
 }

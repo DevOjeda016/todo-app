@@ -33,7 +33,7 @@ export class CreateTaskDialogComponent {
   taskForm = this.fb.group({
     title: ['', [Validators.maxLength(200), Validators.required]],
     description: [''],
-    dueDate: [null as string | null],
+    dueDate: [null as string | null, [Validators.pattern(/^\d{4}-\d{2}-\d{2}$/)]],
     estimatedMinutes: [null as number | null, [Validators.min(1)]],
     tags: [''],
     importance: [null as Importance | null],

@@ -7,10 +7,9 @@
     <div class="flex items-center gap-2">
       <select
         class="text-xs px-2 py-1 rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-800 dark:text-sky-100"
-        [value]="task.status"
-(change)="onStatusChange($any($event.target).value)"
+        (change)="onStatusChange($any($event.target).value)"
       >
-        <option *ngFor="let s of statusValues" [value]="s">{{ s }}</option>
+        <option *ngFor="let s of statusValues" [value]="s" [selected]="task.status === s">{{ s }}</option>
       </select>
       <span class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-800 dark:text-amber-100">{{ task.importance }}</span>
       <button type="button" class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center" (click)="onEdit()" title="Editar">
