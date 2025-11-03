@@ -38,12 +38,18 @@
 </div>
 
 <!-- Tasks grid -->
-<section class="mt-4 grid grid-cols-1 gap-3">
+<section class="mt-4 grid grid-cols-1 gap-3 overflow-y-auto h-3/4 p-4">
   @if (filteredTasks().length === 0) {
-    <p class="text-center text-sm text-gray-500 dark:text-gray-400 py-6">No hay tareas para mostrar.</p>
+    <p class="text-center text-sm text-gray-500 dark:text-gray-400 py-6">
+      No hay tareas para mostrar.
+    </p>
   } @else {
     @for (task of filteredTasks(); track task.id) {
-      <app-task-card [task]="task" (archive)="onArchive($event)" (changeStatus)="onChangeStatus($event)" />
+      <app-task-card
+        [task]="task"
+        (archive)="onArchive($event)"
+        (changeStatus)="onChangeStatus($event)"
+      />
     }
   }
 </section>
