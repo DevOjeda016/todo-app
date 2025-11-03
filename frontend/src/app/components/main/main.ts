@@ -6,7 +6,7 @@ import { ThemeSelectorComponent } from '../../shared/components/theme-selector/t
 import { CreateTaskDialogComponent } from '../../shared/components/create-task-dialog/create-task-dialog.component';
 import { TaskCardComponent } from '../../shared/components/task-card/task-card.component';
 import { Task } from '../../core/models';
-import { TaskService } from '../../core/services';
+import { TaskService, ToastService } from '../../core/services';
 import { Status } from '../../core/enums';
 
 @Component({
@@ -22,7 +22,10 @@ import { Status } from '../../core/enums';
   templateUrl: './main.html',
 })
 export class Main {
-  constructor(private readonly taskService: TaskService) {
+  constructor(
+    private readonly taskService: TaskService,
+    private readonly toast: ToastService,
+  ) {
     void this.loadTasks();
   }
 
@@ -48,6 +51,7 @@ export class Main {
       this.tasks.set(list);
     } catch (err) {
       console.error('Error cargando tareas:', err);
+      this.toast.show('Error cargando tareas', 'error');
       this.tasks.set([]);
     }
   }
@@ -82,6 +86,10 @@ export class Main {
   async toggleShowArchived() {
     this.showArchived.update((v) => !v);
     await this.loadTasks();
+    this.toast.show(
+      this.showArchived() ? 'Mostrando todas (incluye archivadas)' : 'Ocultando archivadas',
+      'info',
+    );
   }
 
   onStatusFilterChange(val: string) {
@@ -95,15 +103,18 @@ export class Main {
       ? await this.taskService.updateTask(evt.id, { archived: false })
       : await this.taskService.archiveTask(evt.id);
     this.tasks.update((prev) => prev.map((t) => (t.id === evt.id ? updated : t)));
+    this.toast.show(evt.archived ? 'Tarea desarchivada' : 'Tarea archivada', 'success');
   }
 
   async onChangeStatus(evt: { id: string; status: Status }) {
     const updated = await this.taskService.updateTask(evt.id, { status: evt.status });
     this.tasks.update((prev) => prev.map((t) => (t.id === evt.id ? updated : t)));
+    this.toast.show('Estado actualizado', 'success');
   }
 
   async onDelete(id: string) {
     await this.taskService.deleteTask(id);
     this.tasks.update((prev) => prev.filter((t) => t.id !== id));
+    this.toast.show('Tarea eliminada', 'success');
   }
 }

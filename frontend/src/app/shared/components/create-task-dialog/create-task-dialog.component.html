@@ -14,6 +14,12 @@
       placeholder="Título"
       class="w-full bg-transparent placeholder:text-gray-500 border-gray-600 hover:border-sky-600 focus:border-sky-700 text-sky-900 dark:text-sky-50 text-sm dark:border-gray-100 rounded-2xl px-2 py-2 transition duration-300 ease focus:outline-none dark:focus:border-sky-800 focus:border border dark:hover:border-gray-400 shadow-sm focus:shadow"
     />
+    <p class="text-xs text-red-500" *ngIf="taskForm.controls['title']?.touched && taskForm.controls['title']?.errors?.['required']">
+      El título es obligatorio.
+    </p>
+    <p class="text-xs text-red-500" *ngIf="taskForm.controls['title']?.touched && taskForm.controls['title']?.errors?.['maxlength']">
+      Máximo 200 caracteres.
+    </p>
 
     <label class="text-sm font-medium text-sky-900 dark:text-sky-100">Descripción</label>
     <textarea
@@ -36,6 +42,9 @@
       placeholder="Minutos estimados"
       class="w-full bg-transparent placeholder:text-gray-500 border-gray-600 hover:border-sky-600 focus:border-sky-700 text-sky-900 dark:text-sky-50 text-sm dark:border-gray-100 rounded-2xl px-2 py-2 transition duration-300 ease focus:outline-none dark:focus:border-sky-800 focus:border border dark:hover:border-gray-400 shadow-sm focus:shadow"
     />
+    <p class="text-xs text-red-500" *ngIf="taskForm.controls['estimatedMinutes']?.touched && taskForm.controls['estimatedMinutes']?.errors?.['min']">
+      Debe ser mayor o igual a 1.
+    </p>
 
     <label class="text-sm font-medium text-sky-900 dark:text-sky-100">Tags</label>
     <input

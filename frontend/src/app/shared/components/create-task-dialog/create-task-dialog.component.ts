@@ -4,7 +4,7 @@ import { Component, ElementRef, EventEmitter, Output, ViewChild, inject } from '
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Importance, Status } from '../../../core/enums';
 import { CreateTask, Task } from '../../../core/models';
-import { TaskService } from '../../../core/services';
+import { TaskService, ToastService } from '../../../core/services';
 
 @Component({
   selector: 'app-create-task-dialog',
@@ -15,6 +15,7 @@ import { TaskService } from '../../../core/services';
 export class CreateTaskDialogComponent {
   private fb = inject(FormBuilder);
   private taskService = inject(TaskService);
+  private toast = inject(ToastService);
 
   @ViewChild('taskModal', { static: true }) dialogRef!: ElementRef<HTMLDialogElement>;
   @Output() created = new EventEmitter<Task>();
@@ -96,14 +97,17 @@ export class CreateTaskDialogComponent {
       if (this.mode === 'create') {
         const task = await this.taskService.createTask(base);
         this.created.emit(task);
+        this.toast.show('Tarea creada', 'success');
       } else if (this.mode === 'edit' && this.editingTaskId) {
         const task = await this.taskService.updateTask(this.editingTaskId, base);
         this.updated.emit(task);
+        this.toast.show('Tarea actualizada', 'success');
       }
       this.taskForm.reset();
       this.close();
     } catch (error) {
       console.error('Error saving task:', error);
+      this.toast.show('Error al guardar la tarea', 'error');
     }
   }
 }
