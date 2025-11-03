@@ -17,9 +17,13 @@ export class TasksService {
     return await this.taskRepository.save(task);
   }
 
-  async findAll(): Promise<Task[]> {
+  async findAll(archived?: 'all' | 'true' | 'false'): Promise<Task[]> {
+    const where =
+      archived === 'all'
+        ? {}
+        : { archived: archived === 'true' ? true : false };
     return await this.taskRepository.find({
-      where: { archived: false },
+      where,
       order: { createdAt: 'DESC' },
     });
   }

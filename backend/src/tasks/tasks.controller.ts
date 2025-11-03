@@ -9,6 +9,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   SerializeOptions,
   UseInterceptors,
 } from '@nestjs/common';
@@ -29,8 +30,8 @@ export class TasksController {
   }
 
   @Get()
-  findAll() {
-    return this.tasksService.findAll();
+  findAll(@Query('archived') archived?: 'all' | 'true' | 'false') {
+    return this.tasksService.findAll(archived);
   }
 
   @Get(':id')
