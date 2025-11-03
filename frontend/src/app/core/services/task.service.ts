@@ -22,8 +22,11 @@ export class TaskService {
     return response.json() as Promise<Task>;
   }
 
-  async getTasks(): Promise<Task[]> {
-    const response = await fetch(this.apiUrl);
+  async getTasks(opts?: { archived?: 'all' | 'true' | 'false' }): Promise<Task[]> {
+    const url = new URL(this.apiUrl);
+    if (opts?.archived) url.searchParams.set('archived', opts.archived);
+
+    const response = await fetch(url.toString());
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -42,7 +45,7 @@ export class TaskService {
     return response.json() as Promise<Task>;
   }
 
-  async updateTask(id: string, task: Partial<CreateTask>): Promise<Task> {
+  async updateTask(id: string, task: Partial<CreateTask> & { archived?: boolean }): Promise<Task> {
     const response = await fetch(`${this.apiUrl}/${id}`, {
       method: 'PATCH',
       headers: {

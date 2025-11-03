@@ -42,7 +42,9 @@ export class Main {
 
   async loadTasks() {
     try {
-      const list = await this.taskService.getTasks();
+      const list = await this.taskService.getTasks({
+        archived: this.showArchived() ? 'all' : 'false',
+      });
       this.tasks.set(list);
     } catch (err) {
       console.error('Error cargando tareas:', err);
@@ -52,6 +54,10 @@ export class Main {
 
   onTaskCreated(task: Task) {
     this.tasks.update((prev) => [task, ...prev]);
+  }
+
+  onTaskUpdated(task: Task) {
+    this.tasks.update((prev) => prev.map((t) => (t.id === task.id ? task : t)));
   }
 
   filteredTasks = computed((): Task[] => {
@@ -73,8 +79,9 @@ export class Main {
     });
   });
 
-  toggleShowArchived() {
+  async toggleShowArchived() {
     this.showArchived.update((v) => !v);
+    await this.loadTasks();
   }
 
   onStatusFilterChange(val: string) {
@@ -83,13 +90,20 @@ export class Main {
     }
   }
 
-  async onArchive(id: string) {
-    const updated = await this.taskService.archiveTask(id);
-    this.tasks.update((prev) => prev.map((t) => (t.id === id ? updated : t)));
+  async onArchive(evt: { id: string; archived: boolean }) {
+    const updated = evt.archived
+      ? await this.taskService.updateTask(evt.id, { archived: false })
+      : await this.taskService.archiveTask(evt.id);
+    this.tasks.update((prev) => prev.map((t) => (t.id === evt.id ? updated : t)));
   }
 
   async onChangeStatus(evt: { id: string; status: Status }) {
     const updated = await this.taskService.updateTask(evt.id, { status: evt.status });
     this.tasks.update((prev) => prev.map((t) => (t.id === evt.id ? updated : t)));
+  }
+
+  async onDelete(id: string) {
+    await this.taskService.deleteTask(id);
+    this.tasks.update((prev) => prev.filter((t) => t.id !== id));
   }
 }

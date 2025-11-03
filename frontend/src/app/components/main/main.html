@@ -47,14 +47,16 @@
     @for (task of filteredTasks(); track task.id) {
       <app-task-card
         [task]="task"
-        (archive)="onArchive($event)"
+        (archiveToggle)="onArchive($event)"
         (changeStatus)="onChangeStatus($event)"
+        (delete)="onDelete($event)"
+        (edit)="taskDialog.openForEdit($event)"
       />
     }
   }
 </section>
 
-<app-create-task-dialog #taskDialog (created)="onTaskCreated($event)" />
+<app-create-task-dialog #taskDialog (created)="onTaskCreated($event)" (updated)="onTaskUpdated($event)" />
 
 <button
   (click)="taskDialog.open()"

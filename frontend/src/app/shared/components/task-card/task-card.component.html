@@ -13,8 +13,14 @@
         <option *ngFor="let s of statusValues" [value]="s">{{ s }}</option>
       </select>
       <span class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-800 dark:text-amber-100">{{ task.importance }}</span>
+      <button type="button" class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center" (click)="onEdit()" title="Editar">
+        <fa-icon [icon]="faPen"></fa-icon>
+      </button>
       <button type="button" class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center" (click)="onArchive()" [title]="task.archived ? 'Desarchivar' : 'Archivar'">
         <fa-icon [icon]="faArchive"></fa-icon>
+      </button>
+      <button type="button" class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center" (click)="onDelete()" title="Eliminar">
+        <fa-icon [icon]="faTrash"></fa-icon>
       </button>
     </div>
   </header>

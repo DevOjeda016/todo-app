@@ -18,12 +18,16 @@ export class CreateTaskDialogComponent {
 
   @ViewChild('taskModal', { static: true }) dialogRef!: ElementRef<HTMLDialogElement>;
   @Output() created = new EventEmitter<Task>();
+  @Output() updated = new EventEmitter<Task>();
 
   // Expose enums values for template
   Status = Status;
   Importance = Importance;
   statusValues = Object.values(Status);
   importanceValues = Object.values(Importance);
+
+  mode: 'create' | 'edit' = 'create';
+  private editingTaskId?: string;
 
   taskForm = this.fb.group({
     title: ['', [Validators.maxLength(200), Validators.required]],
@@ -36,6 +40,29 @@ export class CreateTaskDialogComponent {
   });
 
   open() {
+    // Backward compatible: open in create mode
+    this.openForCreate();
+  }
+
+  openForCreate() {
+    this.mode = 'create';
+    this.editingTaskId = undefined;
+    this.taskForm.reset();
+    this.dialogRef.nativeElement.showModal();
+  }
+
+  openForEdit(task: Task) {
+    this.mode = 'edit';
+    this.editingTaskId = task.id;
+    this.taskForm.reset({
+      title: task.title,
+      description: task.description ?? '',
+      dueDate: task.dueDate ?? null,
+      estimatedMinutes: task.estimatedMinutes ?? null,
+      tags: (task.tags ?? []).join(', '),
+      importance: task.importance ?? null,
+      status: task.status ?? null,
+    });
     this.dialogRef.nativeElement.showModal();
   }
 
@@ -55,7 +82,7 @@ export class CreateTaskDialogComponent {
           .filter((t) => t.length > 0)
       : [];
 
-    const payload: CreateTask = {
+    const base: CreateTask = {
       title: raw.title!,
       ...(raw.description ? { description: raw.description } : {}),
       ...(raw.dueDate ? { dueDate: raw.dueDate } : {}),
@@ -66,12 +93,17 @@ export class CreateTaskDialogComponent {
     };
 
     try {
-      const task = await this.taskService.createTask(payload);
-      this.created.emit(task);
+      if (this.mode === 'create') {
+        const task = await this.taskService.createTask(base);
+        this.created.emit(task);
+      } else if (this.mode === 'edit' && this.editingTaskId) {
+        const task = await this.taskService.updateTask(this.editingTaskId, base);
+        this.updated.emit(task);
+      }
       this.taskForm.reset();
       this.close();
     } catch (error) {
-      console.error('Error creating task:', error);
+      console.error('Error saving task:', error);
     }
   }
 }

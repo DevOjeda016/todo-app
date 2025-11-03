@@ -3,7 +3,7 @@
   class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-xl p-6 w-96 bg-white dark:bg-slate-900 shadow-lg"
 >
   <h2 class="text-lg text-center font-semibold mb-4 text-sky-900 dark:text-slate-100">
-    Crear Tarea
+    {{ mode === 'create' ? 'Crear Tarea' : 'Editar Tarea' }}
   </h2>
 
   <form [formGroup]="taskForm" (ngSubmit)="submitTask()" class="flex flex-col gap-3">
