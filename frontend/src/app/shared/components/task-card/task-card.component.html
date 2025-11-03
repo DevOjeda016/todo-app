@@ -1,4 +1,6 @@
-<article class="relative rounded-2xl border border-sky-200 dark:border-sky-800 bg-white dark:bg-slate-900 p-4 shadow-sm hover:shadow transition">
+<article
+  class="relative rounded-2xl border border-sky-200 dark:border-sky-800 bg-white dark:bg-slate-900 p-4 shadow-sm hover:shadow transition"
+>
   <!-- Kebab for small screens -->
   <button
     type="button"
@@ -11,44 +13,88 @@
 
   <!-- Dropdown menu (small screens) -->
   @if (openMenu) {
-    <div class="absolute z-10 top-10 right-2 sm:hidden w-40 bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow">
+    <div
+      class="absolute z-10 top-10 right-2 sm:hidden w-40 bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow transition transform origin-top-right opacity-100 scale-100"
+    >
       <ul class="py-1 text-sm text-slate-700 dark:text-slate-200">
         <li>
-          <button class="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-slate-800" (click)="onEdit(); closeMenu()">Editar</button>
+          <button
+            class="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-slate-800"
+            (click)="onEdit(); closeMenu()"
+          >
+            Editar
+          </button>
         </li>
         <li>
-          <button class="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-slate-800" (click)="onArchive(); closeMenu()">{{ task.archived ? 'Desarchivar' : 'Archivar' }}</button>
+          <button
+            class="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-slate-800"
+            (click)="onArchive(); closeMenu()"
+          >
+            {{ task.archived ? 'Desarchivar' : 'Archivar' }}
+          </button>
         </li>
         <li>
-          <button class="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-slate-800" (click)="onDelete(); closeMenu()">Eliminar</button>
+          <button
+            class="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-slate-800"
+            (click)="onDelete(); closeMenu()"
+          >
+            Eliminar
+          </button>
         </li>
       </ul>
     </div>
   }
 
-  <header class="flex flex-wrap items-start justify-between gap-2 sm:gap-4">
+  <header class="flex flex-wrap items-start justify-between gap-2 sm:gap-4 pr-10 sm:pr-0">
     <div class="space-y-1 min-w-0 flex-1">
-      <h3 class="text-sky-900 dark:text-sky-100 font-semibold text-lg truncate">{{ task.title }}</h3>
-      <p class="text-sm text-gray-600 dark:text-gray-300 break-words" *ngIf="task.description">{{ task.description }}</p>
+      <h3 class="text-sky-900 dark:text-sky-100 font-semibold text-lg truncate">
+        {{ task.title }}
+      </h3>
+      <p class="text-sm text-gray-600 dark:text-gray-300 break-words" *ngIf="task.description">
+        {{ task.description }}
+      </p>
     </div>
-    <!-- Action bar: hidden on small, visible on sm+ -->
-    <div class="hidden sm:flex items-center gap-2 w-auto justify-end">
+    <!-- Always visible on all screens: status + importance -->
+    <div class="flex items-center gap-2 w-full sm:w-auto justify-start sm:justify-end flex-wrap">
       <select
         class="text-xs px-2 py-1 rounded-lg bg-sky-100 text-sky-700 dark:bg-sky-800 dark:text-sky-100 max-w-[12rem]"
         (change)="onStatusChange($any($event.target).value)"
       >
-        <option *ngFor="let s of statusValues" [value]="s" [selected]="task.status === s">{{ s }}</option>
+        <option *ngFor="let s of statusValues" [value]="s" [selected]="task.status === s">
+          {{ s }}
+        </option>
       </select>
-      <span class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-800 dark:text-amber-100">{{ task.importance }}</span>
-      <button type="button" class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center" (click)="onEdit()" title="Editar">
-        <fa-icon [icon]="faPen"></fa-icon>
-      </button>
-      <button type="button" class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center" (click)="onArchive()" [title]="task.archived ? 'Desarchivar' : 'Archivar'">
-        <fa-icon [icon]="faArchive"></fa-icon>
-      </button>
-      <button type="button" class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center" (click)="onDelete()" title="Eliminar">
-        <fa-icon [icon]="faTrash"></fa-icon>
-      </button>
+      <span
+        class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-800 dark:text-amber-100"
+        >{{ task.importance }}</span
+      >
+      <!-- Action icons only on sm+ -->
+      <div class="hidden sm:flex items-center gap-2">
+        <button
+          type="button"
+          class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center"
+          (click)="onEdit()"
+          title="Editar"
+        >
+          <fa-icon [icon]="faPen"></fa-icon>
+        </button>
+        <button
+          type="button"
+          class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center"
+          (click)="onArchive()"
+          [title]="task.archived ? 'Desarchivar' : 'Archivar'"
+        >
+          <fa-icon [icon]="faArchive"></fa-icon>
+        </button>
+        <button
+          type="button"
+          class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center"
+          (click)="onDelete()"
+          title="Eliminar"
+        >
+          <fa-icon [icon]="faTrash"></fa-icon>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -64,7 +110,11 @@
     <div class="flex items-center gap-2" *ngIf="task.tags?.length">
       <fa-icon [icon]="faTags"></fa-icon>
       <div class="flex flex-wrap gap-1">
-        <span class="text-xs px-2 py-0.5 rounded-full border border-gray-300 dark:border-gray-700" *ngFor="let tag of task.tags">{{ tag }}</span>
+        <span
+          class="text-xs px-2 py-0.5 rounded-full border border-gray-300 dark:border-gray-700"
+          *ngFor="let tag of task.tags"
+          >{{ tag }}</span
+        >
       </div>
     </div>
     <div class="flex items-center gap-2 ml-auto" *ngIf="task.archived">

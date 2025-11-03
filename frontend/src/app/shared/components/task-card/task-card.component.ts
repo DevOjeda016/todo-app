@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostListener, ElementRef } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faArchive,
@@ -20,6 +20,8 @@ import { Status } from '../../../core/enums';
   templateUrl: './task-card.component.html',
 })
 export class TaskCardComponent {
+  constructor(private readonly host: ElementRef<HTMLElement>) {}
+
   @Input({ required: true }) task!: Task;
 
   // Outputs for actions
@@ -47,6 +49,20 @@ export class TaskCardComponent {
 
   closeMenu() {
     this.openMenu = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.openMenu) return;
+    const target = event.target as Node | null;
+    if (target && !this.host.nativeElement.contains(target)) {
+      this.openMenu = false;
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.closeMenu();
   }
 
   get dueDateFormatted() {
