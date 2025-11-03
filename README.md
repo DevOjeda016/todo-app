@@ -69,8 +69,15 @@ Opción B) Manual (sin contenedores)
 - Backend: ver `backend/README.md`
 - Frontend: ver `frontend/README.md`
 
+## Variables de entorno
+
+El backend requiere configurar `backend/.env.development`. Campos importantes:
+- `URL_FRONTEND`: origen permitido para CORS (ej: `http://localhost:4200` o `*` para desarrollo)
+- Variables de base de datos: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
+
 ## Notas
 
-- CORS en backend permite `http://localhost:4200` por defecto.
+- CORS en backend se configura desde `URL_FRONTEND` en `.env.development`.
 - En Docker Compose, el backend usa `DB_HOST=db` (override) y carga variables desde `backend/.env.development`.
 - Endpoints principales: `GET/POST /api/tasks`, `GET/PATCH/DELETE /api/tasks/:id`, `PATCH /api/tasks/:id/archive`.
+- Documentación interactiva disponible en Swagger UI.

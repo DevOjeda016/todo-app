@@ -22,6 +22,8 @@ cp .env.testing.example .env.test
 - `docker-compose.dev.yml` usa `.env.development` para levantar PostgreSQL.
 
 Campos clave en `.env.development`:
+- `PORT` (puerto del servidor, por defecto 3000)
+- `URL_FRONTEND` (origen permitido para CORS, ej: `http://localhost:4200` o `*` para todos)
 - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
 - `POSTGRES_PASSWORD` (para el contenedor de PostgreSQL)
 - `TYPEORM_SYNCHRONIZE` (en dev `true`)
@@ -59,7 +61,7 @@ pnpm start:dev
 
 - Servidor: `http://localhost:3000`
 - Prefijo global: `/api` (ej.: `http://localhost:3000/api/tasks`)
-- CORS: permite `http://localhost:4200`
+- CORS: configurado desde `URL_FRONTEND` en `.env.development`
 
 ## Endpoints principales
 
